@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Node/Vite
+node_modules/
+dist/
+vite-cache/
+
+# Laravel/PHP
+vendor/
+.env
+.env.*
+storage/*.key
+storage/logs/
+storage/framework/
+bootstrap/cache/
+
+# Docker
+db_data/
