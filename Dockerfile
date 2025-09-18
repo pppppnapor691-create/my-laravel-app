@@ -1,14 +1,17 @@
-FROM php:8.4-fpm
+# лучше cli, а не fpm
+FROM php:8.3-cli
 
+# зависимости и расширения PHP
 RUN apt-get update && apt-get install -y \
-    zip unzip curl git libonig-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip
+    zip unzip git libzip-dev libonig-dev libxml2-dev \
+ && docker-php-ext-install pdo_mysql mbstring zip
 
-# Установка Node.js и npm (версия 20.x)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+# composer внутрь
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Установка Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# рабочая папка — корень проекта
+WORKDIR /var/www/html
 
-WORKDIR /asdvar/www/html/src
+# код копировать не обязательно (мы монтируем томом),
+# но можно оставить при желании:
+# COPY . ./
