@@ -1,18 +1,26 @@
 name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Проверяем, что docker-compose читается
-      - name: Validate compose file
-        run: docker compose -f docker-compose.yml config -q
-
-      # Самое простое: просто собираем образы (без запуска)
       - name: Build images
-        run: docker compose -f docker-compose.yml build
+        run: docker compose build
+
+      - name: Install PHP deps (composer)
+        run: docker compose run --rm app composer install --no-interaction --prefer-dist --no-progress
+
+      - name: App key
+        run: docker compose run --rm app php artisan key:generate
+
+      - name: Run tests (only Example tests)
+        run: docker compose run --rm app php artisan test --colors=never
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
